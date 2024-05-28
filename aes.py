@@ -1,4 +1,3 @@
-
 # Constantes do AES
 Sbox = [
     # Matriz de substituição de bytes (S-box) usada no passo de substituição de bytes
@@ -92,24 +91,28 @@ def rot_word(word):
 
 # Função para encriptar um bloco de 16 bytes
 def encrypt_block(block, expanded_key, Nb, Nr):
-    # matriz de 4x4
+    # Inicializa a matriz de estado com o bloco de entrada
     state = [[0] * 4 for _ in range(4)]
     for i in range(4):
         for j in range(4):
             state[j][i] = block[i * 4 + j]
     
+    # Adiciona a chave de rodada inicial
     add_round_key(state, expanded_key[:Nb])
     
+    # Executa as transformações de rodada para cada rodada, exceto a última
     for rnd in range(1, Nr):
-        sub_bytes(state)
-        shift_rows(state)
-        mix_columns(state)
-        add_round_key(state, expanded_key[rnd * Nb:(rnd + 1) * Nb])
+        sub_bytes(state)               # Substitui bytes usando a S-box
+        shift_rows(state)              # Desloca as linhas da matriz de estado
+        mix_columns(state)             # Mistura as colunas da matriz de estado
+        add_round_key(state, expanded_key[rnd * Nb:(rnd + 1) * Nb])  # Adiciona a chave de rodada
     
+    # Última rodada (sem mix_columns)
     sub_bytes(state)
     shift_rows(state)
     add_round_key(state, expanded_key[Nr * Nb:])
     
+    # Converte a matriz de estado para um bloco de bytes criptografados
     encrypted_block = [0] * 16
     for i in range(4):
         for j in range(4):
